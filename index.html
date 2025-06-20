@@ -264,6 +264,67 @@
             z-index: 20;
             text-align: center;
         }
+        #wave-bar-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 38px;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        #wave-bar {
+            position: relative;
+            width: 340px;
+            max-width: 92vw;
+            height: 18px;
+            background: #2b4fa2;
+            border-radius: 9px;
+            box-shadow: 0 2px 8px #0006;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .wave-marker {
+            position: absolute;
+            top: -7px;
+            width: 22px;
+            height: 22px;
+            background: #fff;
+            border: 2px solid #178a2c;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px #178a2c33;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-weight: bold;
+            color: #e53935;
+            transition: background 0.2s;
+        }
+        .wave-marker.final {
+            background: #e53935;
+            color: #fff;
+            border: 2px solid #fff;
+        }
+        #wave-progress {
+            position: absolute;
+            top: -10px;
+            left: 0;
+            width: 28px;
+            height: 28px;
+            transition: left 0.18s cubic-bezier(.77,0,.18,1);
+            z-index: 2;
+            pointer-events: none;
+        }
+        #wave-progress img {
+            width: 100%; height: 100%;
+            display: block;
+            filter: drop-shadow(0 2px 6px #0008);
+        }
     </style>
 </head>
 <body>
@@ -419,7 +480,77 @@
         z-index: 20;
         text-align: center;
     }
+    #wave-bar-container {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw;
+        height: 38px;
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+    #wave-bar {
+        position: relative;
+        width: 340px;
+        max-width: 92vw;
+        height: 18px;
+        background: #2b4fa2;
+        border-radius: 9px;
+        box-shadow: 0 2px 8px #0006;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+    }
+    .wave-marker {
+        position: absolute;
+        top: -7px;
+        width: 22px;
+        height: 22px;
+        background: #fff;
+        border: 2px solid #178a2c;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px #178a2c33;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        font-family: 'Montserrat', Arial, sans-serif;
+        font-weight: bold;
+        color: #e53935;
+        transition: background 0.2s;
+    }
+    .wave-marker.final {
+        background: #e53935;
+        color: #fff;
+        border: 2px solid #fff;
+    }
+    #wave-progress {
+        position: absolute;
+        top: -10px;
+        left: 0;
+        width: 28px;
+        height: 28px;
+        transition: left 0.18s cubic-bezier(.77,0,.18,1);
+        z-index: 2;
+        pointer-events: none;
+    }
+    #wave-progress img {
+        width: 100%; height: 100%;
+        display: block;
+        filter: drop-shadow(0 2px 6px #0008);
+    }
 </style>
+<div id="wave-bar-container">
+    <div id="wave-bar">
+        <div class="wave-marker" style="left:0%;">1</div>
+        <div class="wave-marker" style="left:33.3%;">2</div>
+        <div class="wave-marker" style="left:66.6%;">3</div>
+        <div class="wave-marker final" style="left:100%;">&#x1F6A9;</div>
+        <div id="wave-progress"><img src="zombie.png" alt="zombie" /></div>
+    </div>
+</div>
 <div id="defender-container">
     <canvas id="defender-canvas"></canvas>
     <div id="defender-gameover">¡Perdiste!<br><button id="defender-retry" style="margin-top:1.2rem;">Continuar</button></div>
@@ -692,6 +823,119 @@
                             };
                         }
                     }
+                    // --- Oleadas y barra de progreso ---
+                    const waveCount = 4;
+                    const waveDurations = [9000, 11000, 13000, 14000]; // ms por oleada
+                    const waveEnemyRates = [1000, 700, 500, 350]; // ms entre enemigos
+                    let waveIndex = 0;
+                    let waveStartTime = Date.now();
+                    let waveEnemyInterval = null;
+                    let totalElapsed = 0;
+                    let waveEnemiesSpawned = 0;
+                    let totalEnemiesToSpawn = Math.floor((waveDurations[0]+waveDurations[1]+waveDurations[2]+waveDurations[3])/700);
+                    let allEnemiesSpawned = false;
+                    let progressBar = document.getElementById('wave-bar');
+                    let progressIcon = document.getElementById('wave-progress');
+                    let waveMarkers = progressBar.querySelectorAll('.wave-marker');
+                    let winAnnounced = false;
+
+                    function startWave(idx) {
+                        // Cambia la tasa de aparición de enemigos y resalta la marca
+                        if (waveEnemyInterval) clearInterval(waveEnemyInterval);
+                        waveIndex = idx;
+                        waveStartTime = Date.now();
+                        waveEnemiesSpawned = 0;
+                        waveMarkers.forEach((m,i)=>m.style.background = i===idx ? '#ffe44d' : (i===3?'#e53935':'#fff'));
+                        waveEnemyInterval = setInterval(spawnEnemy, waveEnemyRates[idx]);
+                        // Efecto visual de marca
+                        waveMarkers[idx].style.boxShadow = '0 0 16px 4px #ffe44d88';
+                        setTimeout(()=>{waveMarkers[idx].style.boxShadow='0 2px 8px #178a2c33';}, 1200);
+                    }
+
+                    function stopWaves() {
+                        if (waveEnemyInterval) clearInterval(waveEnemyInterval);
+                        allEnemiesSpawned = true;
+                    }
+
+                    // Inicia la primera oleada
+                    startWave(0);
+                    let waveTimeouts = [];
+                    let accTime = 0;
+                    for (let i=0; i<waveCount; i++) {
+                        accTime += waveDurations[i];
+                        if (i<waveCount-1) {
+                            waveTimeouts.push(setTimeout(()=>startWave(i+1), accTime));
+                        } else {
+                            waveTimeouts.push(setTimeout(()=>{
+                                stopWaves();
+                            }, accTime));
+                        }
+                    }
+
+                    // Barra de progreso animada
+                    function updateProgressBar() {
+                        totalElapsed = Date.now() - (waveStartTime - waveDurations.slice(0,waveIndex).reduce((a,b)=>a+b,0));
+                        let totalDuration = waveDurations.reduce((a,b)=>a+b,0);
+                        let progress = Math.min(1, totalElapsed/totalDuration);
+                        let barW = progressBar.offsetWidth;
+                        let iconW = progressIcon.offsetWidth;
+                        let left = Math.round(progress * (barW-28));
+                        progressIcon.style.left = left + 'px';
+                        // Si terminó la última oleada y no hay enemigos vivos, mostrar victoria
+                        if (allEnemiesSpawned && enemies.length===0 && !winAnnounced) {
+                            winAnnounced = true;
+                            setTimeout(()=>{
+                                showEndScreen(true, true);
+                            }, 600);
+                        }
+                        requestAnimationFrame(updateProgressBar);
+                    }
+                    updateProgressBar();
+
+                    // Modifica showEndScreen para mostrar "¡Ganaste!" si es victoria por oleadas
+                    function showEndScreen(playerWon, isWaveWin) {
+                        const defenderContainer = document.getElementById('defender-container');
+                        if (audio) {
+                            audio.pause();
+                            audio.currentTime = 0;
+                        }
+                        let html = '';
+                        if (playerWon) {
+                            if (isWaveWin) {
+                                html = `
+                                    <div class="arbol-chan-container" id="defender-end" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10;background:url('Fondo texto.jpg') no-repeat center center;background-size:cover;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                                        <div class="arbol-chan-content" style="background:none;box-shadow:none;">
+                                            <img src="Igupai.png" class="arbol-chan-img" alt="Don Árbol" style="opacity:1;transform:none;margin-bottom:0.7rem;animation:none;" />
+                                            <div class="arbol-chan-titulo" style="color:#178a2c;margin-bottom:0.7rem;">¡Ganaste!</div>
+                                            <div class="arbol-chan-texto" style="color:#fff;">
+                                                Has superado las 4 oleadas.<br>¡Eres un verdadero defensor de mangos!<br><br>
+                                                Haz click en continuar para ver tu pista.
+                                            </div>
+                                            <button id="defender-show-clue" class="btn-continuar" style="margin-top:1.2rem;">Ver pista</button>
+                                        </div>
+                                    </div>
+                                `;
+                                defenderContainer.insertAdjacentHTML('beforeend', html);
+                                document.getElementById('defender-show-clue').onclick = function() {
+                                    document.getElementById('defender-end').innerHTML = `
+                                        <h2 style="margin-top:0;">Siguiente pista</h2>
+                                        <div id="defender-next-img" style="margin:0; padding:0;">
+                                            <img src="gym.jpeg" alt="Pista" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:12px 12px 12px 12px;">
+                                        </div>
+                                        <button id="defender-continue" style="font-size:1.3rem;background:#178a2c;color:#fff;border:2px solid #fff;border-radius:8px;padding:0.7rem 2.5rem;font-weight:bold;font-family:'Montserrat',Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.12);cursor:pointer;margin-top:1.5rem;margin-bottom:2rem;">Continuar</button>
+                                    `;
+                                    document.getElementById('defender-continue').onclick = function() {
+                                        window.location.href = "https://danjua77.github.io/Sagrado.Puzzle/";
+                                    };
+                                };
+                                return;
+                            }
+                            // ...existing code for normal win...
+                        } else {
+                            // ...existing code for lose...
+                        }
+                    }
+                    // ...existing code...
                 }, 10);
             }
         });

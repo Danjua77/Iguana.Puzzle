@@ -60,7 +60,7 @@
             border-radius: 0;
             box-shadow: none;
         }
-        /* Imagen baja desde arriba */
+        /* Imagen baja desde arriba y tiembla por ansiedad (todas direcciones) */
         .arbol-chan-img {
             width: 44vw;
             max-width: 180px;
@@ -70,10 +70,52 @@
             opacity: 0;
             transition: opacity 1.2s, transform 1.2s cubic-bezier(.77,0,.18,1);
             transform: translateY(-120px);
+            /* Temblor de ansiedad durante la caída */
+            animation: bajar-cielo 1.2s cubic-bezier(.77,0,.18,1) forwards, shake-ansiedad 0.18s infinite linear;
+        }
+        @keyframes bajar-cielo {
+            0% { opacity: 0; transform: translateY(-120px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shake-ansiedad {
+            0% { transform: translateY(var(--y, -120px)) translateX(0) rotate(0deg); }
+            10% { transform: translateY(calc(var(--y, -120px) - 2px)) translateX(-2px) rotate(-1deg); }
+            20% { transform: translateY(calc(var(--y, -120px) + 2px)) translateX(2px) rotate(1.5deg); }
+            30% { transform: translateY(calc(var(--y, -120px) - 3px)) translateX(1px) rotate(-2deg); }
+            40% { transform: translateY(calc(var(--y, -120px) + 3px)) translateX(-1px) rotate(2deg); }
+            50% { transform: translateY(var(--y, -120px)) translateX(0) rotate(0.5deg); }
+            60% { transform: translateY(calc(var(--y, -120px) + 2px)) translateX(2px) rotate(-1.5deg); }
+            70% { transform: translateY(calc(var(--y, -120px) - 2px)) translateX(-2px) rotate(1deg); }
+            80% { transform: translateY(calc(var(--y, -120px) + 1px)) translateX(1px) rotate(-0.7deg); }
+            90% { transform: translateY(calc(var(--y, -120px) - 1px)) translateX(-1px) rotate(0.7deg); }
+            100% { transform: translateY(var(--y, -120px)) translateX(0) rotate(0deg); }
         }
         .arbol-chan-img.visible {
             opacity: 1;
+            /* Temblor de ansiedad después de bajar */
             transform: translateY(0);
+            animation: shake-ansiedad-visible 0.18s infinite linear;
+        }
+        @keyframes shake-ansiedad-visible {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); }
+            10% { transform: translateY(-2px) translateX(-2px) rotate(-1deg); }
+            20% { transform: translateY(2px) translateX(2px) rotate(1.5deg); }
+            30% { transform: translateY(-3px) translateX(1px) rotate(-2deg); }
+            40% { transform: translateY(3px) translateX(-1px) rotate(2deg); }
+            50% { transform: translateY(0) translateX(0) rotate(0.5deg); }
+            60% { transform: translateY(2px) translateX(2px) rotate(-1.5deg); }
+            70% { transform: translateY(-2px) translateX(-2px) rotate(1deg); }
+            80% { transform: translateY(1px) translateX(1px) rotate(-0.7deg); }
+            90% { transform: translateY(-1px) translateX(-1px) rotate(0.7deg); }
+            100% { transform: translateY(0) translateX(0) rotate(0deg); }
+        }
+        /* Temblor para la imagen de Pong */
+        #pong-top-img {
+            animation: shake-ansiedad-visible 0.18s infinite linear;
+        }
+        /* Temblor para la imagen en la pantalla final */
+        #pong-end .arbol-chan-img, #pong-end .arbol-img {
+            animation: shake-ansiedad-visible 0.18s infinite linear;
         }
         .arbol-chan-titulo {
             font-family: 'Montserrat', Arial, sans-serif;

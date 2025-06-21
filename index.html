@@ -556,7 +556,7 @@
     <div id="defender-gameover">¡Perdiste!<br><button id="defender-retry" style="margin-top:1.2rem;">Continuar</button></div>
 </div>
 <div id="ost-text" style="position:fixed;bottom:18px;left:0;width:100vw;text-align:center;z-index:20;font-family:'Montserrat',Arial,sans-serif;font-size:1.05rem;color:#fff;text-shadow:0 2px 8px #000;">
-    OST: Mt. Dedede - Kirby's Dream Land
+    OST:  At Doom's Gate - DOOM by Bobby Prince
 </div>
 <audio id="pong-audio" src="iguana time.mp3" loop></audio>
 `;
@@ -706,6 +706,7 @@
                             const dist = Math.hypot(e.x + e.size/2 - centerX(), e.y + e.size/2 - centerY());
                             if (dist < e.size / 2 + Math.max(W,H)*0.035 && !e.hit) {
                                 gameOver = true;
+                                onGameOver();
                                 setTimeout(() => {
                                     gameOverDiv.style.display = 'block';
                                 }, 350);
@@ -833,7 +834,15 @@
                     let progressIcon = document.getElementById('wave-progress');
                     let waveMarkers = progressBar.querySelectorAll('.wave-marker');
                     let winAnnounced = false;
-
+                    let progressBarStopped = false;
+                    // Reemplaza los iconos de la barra por imágenes
+                    waveMarkers.forEach((m,i)=>{
+                        if(i<3){
+                            m.innerHTML = '<img src="iganaf.png" alt="iganaf" style="width:18px;height:18px;display:block;">';
+                        }else{
+                            m.innerHTML = '<img src="iga.png" alt="iga" style="width:18px;height:18px;display:block;">';
+                        }
+                    });
                     function startWave(idx) {
                         // Cambia la tasa de aparición de enemigos y resalta la marca
                         if (waveEnemyInterval) clearInterval(waveEnemyInterval);
@@ -869,6 +878,7 @@
 
                     // Barra de progreso animada
                     function updateProgressBar() {
+                        if (gameOver || progressBarStopped) return;
                         totalElapsed = Date.now() - (waveStartTime - waveDurations.slice(0,waveIndex).reduce((a,b)=>a+b,0));
                         let totalDuration = waveDurations.reduce((a,b)=>a+b,0);
                         let progress = Math.min(1, totalElapsed/totalDuration);
@@ -887,6 +897,10 @@
                     }
                     updateProgressBar();
 
+                    // Detener la barra de progreso al perder
+                    function onGameOver() {
+                        progressBarStopped = true;
+                    }
                     // Modifica showEndScreen para mostrar "¡Ganaste!" si es victoria por oleadas
                     function showEndScreen(playerWon, isWaveWin) {
                         const defenderContainer = document.getElementById('defender-container');

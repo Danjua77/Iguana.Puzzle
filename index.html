@@ -296,9 +296,9 @@
     </div>
 </div>
 <div id="ost-text" style="position:fixed;bottom:18px;left:0;width:100vw;text-align:center;z-index:20;font-family:'Montserrat',Arial,sans-serif;font-size:1.05rem;color:#fff;text-shadow:0 2px 8px #000;">
-    OST: Mt. Dedede - Kirby's Dream Land
+    OST:  E1M1 At Doom's Gate - DOOM
 </div>
-<audio id="pong-audio" src="pingpongtime.mp3" loop></audio>
+<audio id="pong-audio" src="iguana time.mp3" loop></audio>
 `;
                 setTimeout(() => {
                     // --- Juego del círculo defensor ---
@@ -321,14 +321,17 @@
                     let score = 0;
                     let winScore = 15; // Gana al destruir 15 enemigos
                     function drawPlayer() {
-                        ctx.beginPath();
-                        ctx.arc(centerX(), centerY(), 20, 0, Math.PI * 2);
-                        ctx.fillStyle = "#fff";
-                        ctx.fill();
-                        // Añadir un borde verde grueso para resaltar el círculo principal
-                        ctx.lineWidth = 6;
-                        ctx.strokeStyle = "#178a2c";
-                        ctx.stroke();
+                        // Dibuja la imagen del mango en el centro
+                        const mangoImg = new Image();
+                        mangoImg.src = "mango.png";
+                        const size = 40; // tamaño del mango
+                        mangoImg.onload = function() {
+                            ctx.drawImage(mangoImg, centerX() - size/2, centerY() - size/2, size, size);
+                        };
+                        // Si ya está cargada, dibuja de inmediato
+                        if (mangoImg.complete) {
+                            ctx.drawImage(mangoImg, centerX() - size/2, centerY() - size/2, size, size);
+                        }
                     }
                     function shootBullet(x, y) {
                         const rect = canvas.getBoundingClientRect();
@@ -341,11 +344,15 @@
                         bullets.push({
                             x: cx,
                             y: cy,
-                            radius: 5,
+                            radius: 12,
                             speed: 8,
                             dx: Math.cos(angle),
-                            dy: Math.sin(angle)
+                            dy: Math.sin(angle),
+                            img: "mango.png"
                         });
+                        // Reproducir sonido de disparo
+                        const mangAudio = new Audio("mang.mp3");
+                        mangAudio.play().catch(()=>{});
                     }
                     function getEnemyType() {
                         const rand = Math.random();
@@ -354,13 +361,14 @@
                         return 'yellow';
                     }
                     function spawnEnemy() {
-                        const size = 30;
+                        const baseSize = 30;
+                        const size = Math.round(baseSize * 2); // 100% más grande (el doble)
                         // Esquinas del canvas
                         const positions = [
-                            { x: 0, y: 0 }, // esquina superior izquierda
-                            { x: canvas.width - size, y: 0 }, // superior derecha
-                            { x: 0, y: canvas.height - size }, // inferior izquierda
-                            { x: canvas.width - size, y: canvas.height - size } // inferior derecha
+                            { x: 0, y: 0 },
+                            { x: canvas.width - size, y: 0 },
+                            { x: 0, y: canvas.height - size },
+                            { x: canvas.width - size, y: canvas.height - size }
                         ];
                         const idx = Math.floor(Math.random() * 4);
                         const pos = positions[idx];
@@ -385,7 +393,8 @@
                             dx: Math.cos(angle),
                             dy: Math.sin(angle),
                             hit: false,
-                            color
+                            color,
+                            baseSpeed: 1.5 // velocidad base del amarillo
                         });
                     }
                     function showEndScreen(playerWon) {
@@ -427,7 +436,7 @@
                             html = `
                                 <div id=\"pong-end\">
                                     <img src=\"Igupai.png\" class=\"arbol-img\" alt=\"Don Árbol\" />
-                                    <h2>Qué desafortunado...</h2>
+                                    <h2>La pandilla de los iguanosos estuvo aquí</h2>
                                     <button id=\"pong-retry\">Continuar</button>
                                 </div>
                             `;
@@ -437,6 +446,37 @@
                             };
                         }
                     }
+                    let gameStarted = false;
+                    let countdown = 3;
+                    function drawCountdown() {
+                        ctx.save();
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        drawPlayer();
+                        ctx.font = `bold 3.5rem Montserrat, Arial, sans-serif`;
+                        ctx.textAlign = "center";
+                        ctx.fillStyle = "#ffe44d";
+                        ctx.shadowColor = "#178a2c";
+                        ctx.shadowBlur = 8;
+                        if (countdown > 0) {
+                            ctx.fillText(countdown, canvas.width/2, canvas.height/2);
+                        }
+                        ctx.restore();
+                    }
+                    // Inicia el contador
+                    function countdownLoop() {
+                        drawCountdown();
+                        if (countdown > 0) {
+                            countdown--;
+                            setTimeout(countdownLoop, 1000);
+                        } else {
+                            setTimeout(() => {
+                                gameStarted = true;
+                                updateGame();
+                                setInterval(spawnEnemy, 1000);
+                            }, 1000);
+                        }
+                    }
+                    countdownLoop();
                     function updateGame() {
                         if (gameOver) return;
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -445,25 +485,57 @@
                             const b = bullets[i];
                             b.x += b.dx * b.speed;
                             b.y += b.dy * b.speed;
-                            ctx.beginPath();
-                            ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
-                            ctx.fillStyle = "cyan";
-                            ctx.fill();
+                            // Dibuja la imagen del mango como bala
+                            const bulletImg = new Image();
+                            bulletImg.src = b.img;
+                            const bulletSize = 24;
+                            bulletImg.onload = function() {
+                                ctx.drawImage(bulletImg, b.x - bulletSize/2, b.y - bulletSize/2, bulletSize, bulletSize);
+                            };
+                            if (bulletImg.complete) {
+                                ctx.drawImage(bulletImg, b.x - bulletSize/2, b.y - bulletSize/2, bulletSize, bulletSize);
+                            }
                             if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
                                 bullets.splice(i, 1);
                             }
                         }
+                        if (!gameStarted) return; // No dibujar ni mover iguanas hasta que termine el contador
                         for (let i = enemies.length - 1; i >= 0; i--) {
                             const e = enemies[i];
                             if (!e.hit) {
                                 e.x += e.dx * e.speed;
                                 e.y += e.dy * e.speed;
                             } else {
-                                e.x -= e.dx * e.speed * 2;
-                                e.y -= e.dy * e.speed * 2;
+                                // Todos retroceden a 15% menos que el amarillo original
+                                const retroSpeed = e.baseSpeed * 0.85;
+                                e.x -= e.dx * retroSpeed;
+                                e.y -= e.dy * retroSpeed;
                             }
-                            ctx.fillStyle = e.hit ? "green" : e.color;
-                            ctx.fillRect(e.x, e.y, e.size, e.size);
+                            // Selecciona la imagen según el color o si está golpeado
+                            let imgSrc = '';
+                            if (e.hit) {
+                                imgSrc = 'iguana verde.png';
+                            } else if (e.color === 'yellow') {
+                                imgSrc = 'iguana amarilla.png';
+                            } else if (e.color === 'red') {
+                                imgSrc = 'iguana roja.png';
+                            } else if (e.color === 'purple') {
+                                imgSrc = 'iguana morada.png';
+                            }
+                            if (imgSrc) {
+                                const enemyImg = new Image();
+                                enemyImg.src = imgSrc;
+                                const renderSize = Math.round(e.size * 1.0); // asegura 100% más grande
+                                enemyImg.onload = function() {
+                                    ctx.drawImage(enemyImg, e.x, e.y, renderSize, renderSize);
+                                };
+                                if (enemyImg.complete) {
+                                    ctx.drawImage(enemyImg, e.x, e.y, renderSize, renderSize);
+                                }
+                            } else {
+                                ctx.fillStyle = e.hit ? "green" : e.color;
+                                ctx.fillRect(e.x, e.y, e.size, e.size);
+                            }
                             const dist = Math.hypot(e.x + e.size/2 - centerX(), e.y + e.size/2 - centerY());
                             if (dist < e.size / 2 + 20 && !e.hit) {
                                 gameOver = true;
@@ -502,14 +574,16 @@
                         ctx.restore();
                         requestAnimationFrame(updateGame);
                     }
+                    // Eventos de disparo solo cuando gameStarted es true
                     canvas.addEventListener('touchstart', e => {
+                        if (!gameStarted) return;
                         const touch = e.touches[0];
                         shootBullet(touch.clientX, touch.clientY);
                     });
                     canvas.addEventListener('mousedown', e => {
+                        if (!gameStarted) return;
                         shootBullet(e.clientX, e.clientY);
                     });
-                    setInterval(spawnEnemy, 1000);
                     // Inicia la música
                     const audio = document.getElementById('pong-audio');
                     if (audio) {
@@ -520,7 +594,7 @@
                             audio.play().catch(()=>{});
                         });
                     }
-                    updateGame();
+                    // No llamar updateGame() aquí, lo hace el contador
                 }, 10);
             }
         });

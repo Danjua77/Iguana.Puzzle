@@ -602,14 +602,11 @@
                         ctx.fill();
                         ctx.stroke();
                         ctx.restore();
-                        // Dibuja el jugador
+                        // Dibuja el jugador como imagen de mango
                         ctx.save();
-                        ctx.beginPath();
-                        ctx.arc(centerX(), centerY(), Math.max(W,H)*0.035, 0, Math.PI*2);
-                        ctx.fillStyle = "#ffe44d";
-                        ctx.shadowColor = "#178a2c";
-                        ctx.shadowBlur = 12;
-                        ctx.fill();
+                        const mangoImg = new window.Image();
+                        mangoImg.src = 'mango.png';
+                        ctx.drawImage(mangoImg, centerX() - Math.max(W,H)*0.045, centerY() - Math.max(W,H)*0.045, Math.max(W,H)*0.09, Math.max(W,H)*0.09);
                         ctx.restore();
                     }
                     function shootBullet(x, y) {
@@ -639,7 +636,7 @@
                         else { x = -size; y = Math.random() * H; }
                         const angle = Math.atan2(centerY() - y, centerX() - x);
                         const type = getEnemyType();
-                        let speed = Math.max(W,H)*0.0085 * 0.85 * 0.85;
+                        let speed = Math.max(W,H)*0.0085 * 0.85 * 0.85 * 0.85; // velocidad reducida 15%
                         let color = "#ffe44d";
                         if (type === 'red') {
                             speed *= 1.35;
@@ -679,12 +676,10 @@
                             b.x += b.dx * b.speed;
                             b.y += b.dy * b.speed;
                             ctx.save();
-                            ctx.beginPath();
-                            ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
-                            ctx.fillStyle = "#2b4fa2";
-                            ctx.shadowColor = "#ffe44d";
-                            ctx.shadowBlur = 8;
-                            ctx.fill();
+                            // Dibuja el disparo como imagen de mango
+                            const bulletImg = new window.Image();
+                            bulletImg.src = 'mango.png';
+                            ctx.drawImage(bulletImg, b.x - b.radius, b.y - b.radius, b.radius*2, b.radius*2);
                             ctx.restore();
                             if (b.x < 0 || b.x > W || b.y < 0 || b.y > H) {
                                 bullets.splice(i, 1);

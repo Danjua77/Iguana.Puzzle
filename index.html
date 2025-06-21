@@ -325,6 +325,10 @@
                         ctx.arc(centerX(), centerY(), 20, 0, Math.PI * 2);
                         ctx.fillStyle = "#fff";
                         ctx.fill();
+                        // Añadir un borde verde grueso para resaltar el círculo principal
+                        ctx.lineWidth = 6;
+                        ctx.strokeStyle = "#178a2c";
+                        ctx.stroke();
                     }
                     function shootBullet(x, y) {
                         const rect = canvas.getBoundingClientRect();

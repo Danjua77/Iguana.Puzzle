@@ -396,16 +396,25 @@
                     let score = 0;
                     let winScore = 0;
                     // --- Oleadas de enemigos ---
+                    // Ajuste: 20% más fáciles (reducción adicional del 20%)
                     const waves = [
-                        { yellow: Math.round(36 * 0.8), red: Math.round(24 * 0.8), purple: Math.round(12 * 0.8), interval: 400 }, // Oleada 1 (20% menos)
-                        { yellow: Math.round(24 * 0.8), red: Math.round(48 * 0.8), purple: Math.round(24 * 0.8), interval: 300 }, // Oleada 2
-                        { yellow: Math.round(12 * 0.8), red: Math.round(60 * 0.8), purple: Math.round(36 * 0.8), interval: 200 }, // Oleada 3
-                        { yellow: 0, red: Math.round(80 * 0.8), purple: Math.round(60 * 0.8), interval: 120 } // Oleada 4
+                        { yellow: Math.round(36 * 0.8 * 0.8), red: Math.round(24 * 0.8 * 0.8), purple: Math.round(12 * 0.8 * 0.8), interval: 400 }, // Oleada 1
+                        { yellow: Math.round(24 * 0.8 * 0.8), red: Math.round(48 * 0.8 * 0.8), purple: Math.round(24 * 0.8 * 0.8), interval: 300 }, // Oleada 2
+                        { yellow: Math.round(12 * 0.8 * 0.8), red: Math.round(60 * 0.8 * 0.8), purple: Math.round(36 * 0.8 * 0.8), interval: 200 }, // Oleada 3
+                        { yellow: 0, red: Math.round(80 * 0.8 * 0.8), purple: Math.round(60 * 0.8 * 0.8), interval: 120 } // Oleada 4
                     ];
                     let currentWave = 0;
                     let enemiesToSpawn = [];
                     let totalEnemies = 0;
                     for (const w of waves) winScore += w.yellow + w.red + w.purple;
+
+                    // Calcular los puntos de inicio de cada oleada para la barra de progreso
+                    const waveStartPoints = [];
+                    let acc = 0;
+                    for (const w of waves) {
+                        waveStartPoints.push(acc);
+                        acc += w.yellow + w.red + w.purple;
+                    }
 
                     function prepareWave(waveIndex) {
                         const wave = waves[waveIndex];
@@ -668,6 +677,37 @@
                         if (fill) {
                             const percent = Math.min(score / winScore, 1) * 100;
                             fill.style.width = percent + '%';
+                        }
+                        // Marcar los puntos de inicio de cada oleada
+                        let markers = document.getElementById('progress-bar-markers');
+                        if (!markers) {
+                            markers = document.createElement('div');
+                            markers.id = 'progress-bar-markers';
+                            markers.style.position = 'absolute';
+                            markers.style.left = '0';
+                            markers.style.top = '0';
+                            markers.style.width = '100%';
+                            markers.style.height = '100%';
+                            markers.style.pointerEvents = 'none';
+                            markers.style.zIndex = '2';
+                            fill.parentElement.appendChild(markers);
+                        }
+                        markers.innerHTML = '';
+                        for (let i = 1; i < waveStartPoints.length; i++) { // No marcar el 0%
+                            const percent = (waveStartPoints[i] / winScore) * 100;
+                            const marker = document.createElement('div');
+                            marker.style.position = 'absolute';
+                            marker.style.left = `calc(${percent}% - 6px)`;
+                            marker.style.top = '50%';
+                            marker.style.transform = 'translateY(-50%)';
+                            marker.style.width = '12px';
+                            marker.style.height = '12px';
+                            marker.style.background = '#ffe44d';
+                            marker.style.border = '2px solid #fff176';
+                            marker.style.borderRadius = '50%';
+                            marker.style.boxShadow = '0 0 8px #ffe44d99';
+                            marker.style.zIndex = '3';
+                            markers.appendChild(marker);
                         }
                     }
                     function updateGame() {

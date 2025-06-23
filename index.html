@@ -140,7 +140,16 @@
             box-shadow: 0 2px 8px #178a2c22;
             border: 2px solid #178a2c;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+        #iganaf-bar-img {
             display: block;
+            margin: 0 6px 0 4px;
+            width: 32px;
+            height: 24px;
+            object-fit: contain;
+            flex-shrink: 0;
         }
         #progress-bar-fill {
             height: 100%;
@@ -149,6 +158,10 @@
             width: 0%;
             transition: width 0.3s cubic-bezier(.77,0,.18,1);
             box-shadow: 0 0 8px #ffe44d99;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1;
         }
         #game-rect {
             background: #fff;
@@ -297,7 +310,16 @@
         box-shadow: 0 2px 8px #178a2c22;
         border: 2px solid #178a2c;
         overflow: hidden;
+        display: flex;
+        align-items: center;
+    }
+    #iganaf-bar-img {
         display: block;
+        margin: 0 6px 0 4px;
+        width: 32px;
+        height: 24px;
+        object-fit: contain;
+        flex-shrink: 0;
     }
     #progress-bar-fill {
         height: 100%;
@@ -306,6 +328,10 @@
         width: 0%;
         transition: width 0.3s cubic-bezier(.77,0,.18,1);
         box-shadow: 0 0 8px #ffe44d99;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 1;
     }
     #game-rect {
         background: #fff;
@@ -333,7 +359,10 @@
     }
 </style>
 <div id="pong-container">
-    <div id="progress-bar-container"><div id="progress-bar-fill"></div></div>
+    <div id="progress-bar-container">
+        <img src="iganaf.png" id="iganaf-bar-img" alt="Iguana F" />
+        <div id="progress-bar-fill"></div>
+    </div>
     <div id="game-rect">
       <canvas id="gameCanvas"></canvas>
     </div>

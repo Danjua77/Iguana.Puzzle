@@ -131,7 +131,7 @@
         }
         #progress-bar-container {
             width: 80%;
-            max-width: 400px;
+            max-width: 300px;
             height: 26px;
             background: #e0e0e0;
             border-radius: 13px;
@@ -142,14 +142,41 @@
             overflow: hidden;
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            padding: 0;
         }
-        #iganaf-bar-img {
+        #progress-bar-flex {
+            flex: 1 1 auto;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        #progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffe44d 60%, #fff176 100%);
+            border-radius: 13px 0 0 13px;
+            width: 0%;
+            transition: width 0.3s cubic-bezier(.77,0,.18,1);
+            box-shadow: 0 0 8px #ffe44d99;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1;
+        }
+        #iganaf-bar-img, #iganaf-bar-img-end {
             display: block;
-            margin: 0 6px 0 4px;
             width: 32px;
             height: 24px;
             object-fit: contain;
             flex-shrink: 0;
+            z-index: 2;
+        }
+        #iganaf-bar-img {
+            margin: 0 6px 0 4px;
+        }
+        #iganaf-bar-img-end {
+            margin: 0 4px 0 6px;
         }
         #progress-bar-fill {
             height: 100%;
@@ -312,14 +339,41 @@
         overflow: hidden;
         display: flex;
         align-items: center;
+        justify-content: space-between;
+        padding: 0;
     }
-    #iganaf-bar-img {
+    #progress-bar-flex {
+        flex: 1 1 auto;
+        height: 100%;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    #progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ffe44d 60%, #fff176 100%);
+        border-radius: 13px 0 0 13px;
+        width: 0%;
+        transition: width 0.3s cubic-bezier(.77,0,.18,1);
+        box-shadow: 0 0 8px #ffe44d99;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 1;
+    }
+    #iganaf-bar-img, #iganaf-bar-img-end {
         display: block;
-        margin: 0 6px 0 4px;
         width: 32px;
         height: 24px;
         object-fit: contain;
         flex-shrink: 0;
+        z-index: 2;
+    }
+    #iganaf-bar-img {
+        margin: 0 6px 0 4px;
+    }
+    #iganaf-bar-img-end {
+        margin: 0 4px 0 6px;
     }
     #progress-bar-fill {
         height: 100%;
@@ -361,7 +415,10 @@
 <div id="pong-container">
     <div id="progress-bar-container">
         <img src="iganaf.png" id="iganaf-bar-img" alt="Iguana F" />
-        <div id="progress-bar-fill"></div>
+        <div id="progress-bar-flex">
+            <div id="progress-bar-fill"></div>
+        </div>
+        <img src="iga.png" id="iganaf-bar-img-end" alt="Iguana" />
     </div>
     <div id="game-rect">
       <canvas id="gameCanvas"></canvas>

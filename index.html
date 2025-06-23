@@ -424,7 +424,7 @@
                                 document.getElementById('pong-end').innerHTML = `
                                     <h2 style=\"margin-top:0;\">Siguiente pista</h2>
                                     <div id=\"pong-next-img\" style=\"margin:0; padding:0;\">
-                                        <img src=\"gym.jpeg\" alt=\"Pista\" style=\"width:100%;height:100%;object-fit:cover;display:block;border-radius:12px 12px 12px 12px;\">
+                                        <img src=\"silla2\" alt=\"Pista\" style=\"width:100%;height:100%;object-fit:cover;display:block;border-radius:12px 12px 12px 12px;\">
                                     </div>
                                     <button id=\"pong-continue\" style=\"font-size:1.3rem;background:#178a2c;color:#fff;border:2px solid #fff;border-radius:8px;padding:0.7rem 2.5rem;font-weight:bold;font-family:'Montserrat',Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.12);cursor:pointer;margin-top:1.5rem;margin-bottom:2rem;\">Continuar</button>
                                 `;
@@ -481,6 +481,31 @@
                         if (gameOver) return;
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         drawPlayer();
+                        // Dibuja la barra de progreso centrada arriba
+                        const barWidth = Math.min(canvas.width * 0.7, 260);
+                        const barHeight = 18;
+                        const barX = (canvas.width - barWidth) / 2;
+                        const barY = 32;
+                        // Fondo de la barra
+                        ctx.save();
+                        ctx.globalAlpha = 0.85;
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(barX, barY, barWidth, barHeight);
+                        ctx.globalAlpha = 1;
+                        ctx.strokeStyle = '#178a2c';
+                        ctx.lineWidth = 3;
+                        ctx.strokeRect(barX, barY, barWidth, barHeight);
+                        // Progreso animado
+                        const progress = Math.min(score / winScore, 1);
+                        const prevProgress = ctx._prevProgress || 0;
+                        const animProgress = prevProgress + (progress - prevProgress) * 0.18;
+                        ctx._prevProgress = animProgress;
+                        ctx.fillStyle = '#ffe44d';
+                        ctx.shadowColor = '#178a2c';
+                        ctx.shadowBlur = 8;
+                        ctx.fillRect(barX, barY, barWidth * animProgress, barHeight);
+                        ctx.shadowBlur = 0;
+                        ctx.restore();
                         for (let i = bullets.length - 1; i >= 0; i--) {
                             const b = bullets[i];
                             b.x += b.dx * b.speed;
@@ -563,15 +588,7 @@
                                 }
                             }
                         }
-                        // Dibuja el puntaje arriba
-                        ctx.save();
-                        ctx.font = `bold 2.2rem Montserrat, Arial, sans-serif`;
-                        ctx.textAlign = "center";
-                        ctx.fillStyle = "#ffe44d";
-                        ctx.shadowColor = "#178a2c";
-                        ctx.shadowBlur = 8;
-                        ctx.fillText(score + " / " + winScore, canvas.width/2, 60);
-                        ctx.restore();
+                        // Elimina el score numérico
                         requestAnimationFrame(updateGame);
                     }
                     // Eventos de disparo solo cuando gameStarted es true

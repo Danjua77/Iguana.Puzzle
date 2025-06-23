@@ -116,6 +116,7 @@
         #pong-container {
             /* Centrado absoluto vertical y horizontal */
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             position: fixed;
@@ -127,6 +128,27 @@
             /* Elimina cualquier margen/padding extra */
             margin: 0;
             padding: 0;
+        }
+        #progress-bar-container {
+            width: 80%;
+            max-width: 400px;
+            height: 26px;
+            background: #e0e0e0;
+            border-radius: 13px;
+            margin: 0 0 18px 0;
+            position: relative;
+            box-shadow: 0 2px 8px #178a2c22;
+            border: 2px solid #178a2c;
+            overflow: hidden;
+            display: block;
+        }
+        #progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffe44d 60%, #fff176 100%);
+            border-radius: 13px 0 0 13px;
+            width: 0%;
+            transition: width 0.3s cubic-bezier(.77,0,.18,1);
+            box-shadow: 0 0 8px #ffe44d99;
         }
         #game-rect {
             background: #fff;
@@ -264,6 +286,27 @@
                 document.body.innerHTML = `
 <style>
     /* ... pong styles already included above ... */
+    #progress-bar-container {
+        width: 80%;
+        max-width: 300px;
+        height: 26px;
+        background: #e0e0e0;
+        border-radius: 13px;
+        margin: 0 0 18px 0;
+        position: relative;
+        box-shadow: 0 2px 8px #178a2c22;
+        border: 2px solid #178a2c;
+        overflow: hidden;
+        display: block;
+    }
+    #progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ffe44d 60%, #fff176 100%);
+        border-radius: 13px 0 0 13px;
+        width: 0%;
+        transition: width 0.3s cubic-bezier(.77,0,.18,1);
+        box-shadow: 0 0 8px #ffe44d99;
+    }
     #game-rect {
         background: #fff;
         border: 5px solid #178a2c;
@@ -290,7 +333,7 @@
     }
 </style>
 <div id="pong-container">
-    <img src="Igupai.png" alt="Don Árbol" style="width:28vw;max-width:110px;min-width:60px;margin-bottom:1.2vh;margin-top:calc(2vh - 20px);z-index:2;position:absolute;top:calc(2vh - 17px);left:50%;transform:translateX(-50%);" id="pong-top-img" />
+    <div id="progress-bar-container"><div id="progress-bar-fill"></div></div>
     <div id="game-rect">
       <canvas id="gameCanvas"></canvas>
     </div>
@@ -319,7 +362,7 @@
                     let gameOver = false;
                     let playerWon = false;
                     let score = 0;
-                    let winScore = 15; // Gana al destruir 15 enemigos
+                    let winScore = 15;
                     function drawPlayer() {
                         // Dibuja la imagen del mango en el centro
                         const mangoImg = new Image();
@@ -451,16 +494,19 @@
                     function drawCountdown() {
                         ctx.save();
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        drawPlayer();
+                        // Dibuja primero el número de cuenta regresiva, un poco más arriba del mango
                         ctx.font = `bold 3.5rem Montserrat, Arial, sans-serif`;
                         ctx.textAlign = "center";
                         ctx.fillStyle = "#ffe44d";
                         ctx.shadowColor = "#178a2c";
                         ctx.shadowBlur = 8;
                         if (countdown > 0) {
-                            ctx.fillText(countdown, canvas.width/2, canvas.height/2);
+                            ctx.fillText(countdown, canvas.width/2, canvas.height/2 - 40);
                         }
+                        ctx.shadowBlur = 0;
                         ctx.restore();
+                        // Luego dibuja la imagen del mango debajo del número
+                        drawPlayer();
                     }
                     // Inicia el contador
                     function countdownLoop() {
@@ -477,35 +523,18 @@
                         }
                     }
                     countdownLoop();
+                    function updateProgressBar() {
+                        const fill = document.getElementById('progress-bar-fill');
+                        if (fill) {
+                            const percent = Math.min(score / winScore, 1) * 100;
+                            fill.style.width = percent + '%';
+                        }
+                    }
                     function updateGame() {
                         if (gameOver) return;
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         drawPlayer();
-                        // Dibuja la barra de progreso centrada arriba
-                        const barWidth = Math.min(canvas.width * 0.7, 260);
-                        const barHeight = 18;
-                        const barX = (canvas.width - barWidth) / 2;
-                        const barY = 32;
-                        // Fondo de la barra
-                        ctx.save();
-                        ctx.globalAlpha = 0.85;
-                        ctx.fillStyle = '#fff';
-                        ctx.fillRect(barX, barY, barWidth, barHeight);
-                        ctx.globalAlpha = 1;
-                        ctx.strokeStyle = '#178a2c';
-                        ctx.lineWidth = 3;
-                        ctx.strokeRect(barX, barY, barWidth, barHeight);
-                        // Progreso animado
-                        const progress = Math.min(score / winScore, 1);
-                        const prevProgress = ctx._prevProgress || 0;
-                        const animProgress = prevProgress + (progress - prevProgress) * 0.18;
-                        ctx._prevProgress = animProgress;
-                        ctx.fillStyle = '#ffe44d';
-                        ctx.shadowColor = '#178a2c';
-                        ctx.shadowBlur = 8;
-                        ctx.fillRect(barX, barY, barWidth * animProgress, barHeight);
-                        ctx.shadowBlur = 0;
-                        ctx.restore();
+                        // Eliminada la barra de progreso y score
                         for (let i = bullets.length - 1; i >= 0; i--) {
                             const b = bullets[i];
                             b.x += b.dx * b.speed;
@@ -570,11 +599,9 @@
                             if (e.hit && (e.x < -50 || e.x > canvas.width + 50 || e.y < -50 || e.y > canvas.height + 50)) {
                                 enemies.splice(i, 1);
                                 score++;
-                                if (score >= winScore) {
-                                    gameOver = true;
-                                    setTimeout(() => showEndScreen(true), 600);
-                                    return;
-                                }
+                                updateProgressBar();
+                                // Eliminado: score++;
+                                // Eliminado: if (score >= winScore) { ... }
                             }
                             for (let j = bullets.length - 1; j >= 0; j--) {
                                 const b = bullets[j];
@@ -588,7 +615,6 @@
                                 }
                             }
                         }
-                        // Elimina el score numérico
                         requestAnimationFrame(updateGame);
                     }
                     // Eventos de disparo solo cuando gameStarted es true

@@ -451,10 +451,10 @@
                     let winScore = 0;
                     // --- Oleadas de enemigos ---
                     const waves = [
-                        { yellow: 36, red: 24, purple: 12, interval: 400 }, // Oleada 1 (mucho más difícil)
-                        { yellow: 24, red: 48, purple: 24, interval: 300 }, // Oleada 2
-                        { yellow: 12, red: 60, purple: 36, interval: 200 }, // Oleada 3
-                        { yellow: 0, red: 80, purple: 60, interval: 120 } // Oleada 4
+                        { yellow: Math.round(36 * 0.8), red: Math.round(24 * 0.8), purple: Math.round(12 * 0.8), interval: 400 }, // Oleada 1 (20% menos)
+                        { yellow: Math.round(24 * 0.8), red: Math.round(48 * 0.8), purple: Math.round(24 * 0.8), interval: 300 }, // Oleada 2
+                        { yellow: Math.round(12 * 0.8), red: Math.round(60 * 0.8), purple: Math.round(36 * 0.8), interval: 200 }, // Oleada 3
+                        { yellow: 0, red: Math.round(80 * 0.8), purple: Math.round(60 * 0.8), interval: 120 } // Oleada 4
                     ];
                     let currentWave = 0;
                     let enemiesToSpawn = [];
@@ -820,8 +820,12 @@
                         requestAnimationFrame(updateGame);
                     }
                     // Eventos de disparo solo cuando gameStarted es true
+                    let lastTouchTime = 0;
                     canvas.addEventListener('touchstart', e => {
                         if (!gameStarted) return;
+                        const now = Date.now();
+                        if (now - lastTouchTime < 200) return; // Evita múltiples disparos rápidos
+                        lastTouchTime = now;
                         const touch = e.touches[0];
                         shootBullet(touch.clientX, touch.clientY);
                     });

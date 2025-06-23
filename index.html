@@ -280,7 +280,7 @@
 <body>
     <div class="arbol-chan-container" id="arbol-chan-container">
         <div class="arbol-chan-content">
-            <img src="Igupai.png" class="arbol-chan-img" id="arbol-chan-img" alt="Tree-chan" />
+            <img src="parrishiguana.png" class="arbol-chan-img" id="arbol-chan-img" alt="Tree-chan" />
             <div class="arbol-chan-titulo" id="arbol-chan-titulo">Reptilian</div>
             <div class="arbol-chan-texto" id="arbol-chan-texto">
                 ¿Mango? ¡MANGO!
@@ -451,10 +451,10 @@
                     let winScore = 0;
                     // --- Oleadas de enemigos ---
                     const waves = [
-                        { yellow: 18, red: 10, purple: 2, interval: 800 }, // Oleada 1 (más enemigos y más rápido)
-                        { yellow: 12, red: 24, purple: 6, interval: 650 }, // Oleada 2 (más rojos y morados, más rápido)
-                        { yellow: 8, red: 28, purple: 18, interval: 550 }, // Oleada 3 (más rojos y morados, aún más rápido)
-                        { yellow: 0, red: 30, purple: 30, interval: 450 } // Oleada 4 (solo rojos y morados, muy rápido)
+                        { yellow: 36, red: 24, purple: 12, interval: 400 }, // Oleada 1 (mucho más difícil)
+                        { yellow: 24, red: 48, purple: 24, interval: 300 }, // Oleada 2
+                        { yellow: 12, red: 60, purple: 36, interval: 200 }, // Oleada 3
+                        { yellow: 0, red: 80, purple: 60, interval: 120 } // Oleada 4
                     ];
                     let currentWave = 0;
                     let enemiesToSpawn = [];
@@ -480,17 +480,25 @@
                         const type = enemiesToSpawn.shift();
                         const baseSize = 30;
                         const size = Math.round(baseSize * 2);
-                        const positions = [
-                            { x: 0, y: 0 },
-                            { x: canvas.width - size, y: 0 },
-                            { x: 0, y: canvas.height - size },
-                            { x: canvas.width - size, y: canvas.height - size }
-                        ];
-                        const idx = Math.floor(Math.random() * 4);
-                        const pos = positions[idx];
+                        // Enemigos salen de cualquier punto de los bordes
+                        const wall = Math.floor(Math.random() * 4); // 0: top, 1: right, 2: bottom, 3: left
+                        let x, y;
+                        if (wall === 0) { // top
+                            x = Math.random() * (canvas.width - size);
+                            y = 0;
+                        } else if (wall === 1) { // right
+                            x = canvas.width - size;
+                            y = Math.random() * (canvas.height - size);
+                        } else if (wall === 2) { // bottom
+                            x = Math.random() * (canvas.width - size);
+                            y = canvas.height - size;
+                        } else { // left
+                            x = 0;
+                            y = Math.random() * (canvas.height - size);
+                        }
                         const cx = centerX();
                         const cy = centerY();
-                        const angle = Math.atan2(cy - (pos.y + size/2), cx - (pos.x + size/2));
+                        const angle = Math.atan2(cy - (y + size/2), cx - (x + size/2));
                         let speed = 1.5;
                         let color = "yellow";
                         if (type === 'red') {
@@ -501,8 +509,8 @@
                             color = "purple";
                         }
                         enemies.push({
-                            x: pos.x,
-                            y: pos.y,
+                            x,
+                            y,
                             size,
                             speed,
                             dx: Math.cos(angle),
@@ -578,18 +586,25 @@
                         const type = enemiesToSpawn.shift();
                         const baseSize = 30;
                         const size = Math.round(baseSize * 2);
-                        // Esquinas del canvas
-                        const positions = [
-                            { x: 0, y: 0 },
-                            { x: canvas.width - size, y: 0 },
-                            { x: 0, y: canvas.height - size },
-                            { x: canvas.width - size, y: canvas.height - size }
-                        ];
-                        const idx = Math.floor(Math.random() * 4);
-                        const pos = positions[idx];
+                        // Enemigos salen de cualquier punto de los bordes
+                        const wall = Math.floor(Math.random() * 4); // 0: top, 1: right, 2: bottom, 3: left
+                        let x, y;
+                        if (wall === 0) { // top
+                            x = Math.random() * (canvas.width - size);
+                            y = 0;
+                        } else if (wall === 1) { // right
+                            x = canvas.width - size;
+                            y = Math.random() * (canvas.height - size);
+                        } else if (wall === 2) { // bottom
+                            x = Math.random() * (canvas.width - size);
+                            y = canvas.height - size;
+                        } else { // left
+                            x = 0;
+                            y = Math.random() * (canvas.height - size);
+                        }
                         const cx = centerX();
                         const cy = centerY();
-                        const angle = Math.atan2(cy - (pos.y + size/2), cx - (pos.x + size/2));
+                        const angle = Math.atan2(cy - (y + size/2), cx - (x + size/2));
                         let speed = 1.5;
                         let color = "yellow";
                         if (type === 'red') {
@@ -600,8 +615,8 @@
                             color = "purple";
                         }
                         enemies.push({
-                            x: pos.x,
-                            y: pos.y,
+                            x,
+                            y,
                             size,
                             speed,
                             dx: Math.cos(angle),
@@ -625,7 +640,7 @@
                             html = `
                                 <div class=\"arbol-chan-container\" id=\"pong-end\" style=\"position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10;background:url('Fondo texto.jpg') no-repeat center center;background-size:cover;display:flex;flex-direction:column;justify-content:center;align-items:center;\">
                                     <div class=\"arbol-chan-content\" style=\"background:none;box-shadow:none;\">
-                                        <img src=\"Igupai.png\" class=\"arbol-chan-img\" alt=\"Don Árbol\" style=\"opacity:1;transform:none;margin-bottom:0.7rem;\" />
+                                        <img src=\"parrishiguana.png\" class=\"arbol-chan-img\" alt=\"Don Árbol\" style=\"opacity:1;transform:none;margin-bottom:0.7rem;\" />
                                         <div class=\"arbol-chan-titulo\" style=\"color:#178a2c;margin-bottom:0.7rem;\">Reptilian</div>
                                         <div class=\"arbol-chan-texto\" style=\"color:#fff;\">
                                             Jummy Jummy
@@ -650,8 +665,7 @@
                         } else {
                             html = `
                                 <div id=\"pong-end\">
-                                    <img src=\"Igupai.png\" class=\"arbol-img\" alt=\"Don Árbol\" />
-                                    <h2>La pandilla de los iguanosos estuvo aquí</h2>
+                                    <img src=\"ps.png\" class=\"arbol-img\" alt=\"Perdiste\" />
                                     <button id=\"pong-retry\">Continuar</button>
                                 </div>
                             `;

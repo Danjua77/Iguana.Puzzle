@@ -448,7 +448,90 @@
                     let gameOver = false;
                     let playerWon = false;
                     let score = 0;
-                    let winScore = 15;
+                    let winScore = 0;
+                    // --- Oleadas de enemigos ---
+                    const waves = [
+                        { yellow: 14, red: 6, purple: 0, interval: 1000 }, // Oleada 1 (igual)
+                        { yellow: 10, red: 20, purple: 0, interval: 870 }, // Oleada 2 (15% más rápido)
+                        { yellow: 10, red: 20, purple: 10, interval: 800 }, // Oleada 3 (20% más rápido)
+                        { yellow: 0, red: 20, purple: 20, interval: 800 } // Oleada 4 (20% más rápido)
+                    ];
+                    let currentWave = 0;
+                    let enemiesToSpawn = [];
+                    let totalEnemies = 0;
+                    for (const w of waves) winScore += w.yellow + w.red + w.purple;
+
+                    function prepareWave(waveIndex) {
+                        const wave = waves[waveIndex];
+                        enemiesToSpawn = [];
+                        for (let i = 0; i < wave.yellow; i++) enemiesToSpawn.push('yellow');
+                        for (let i = 0; i < wave.red; i++) enemiesToSpawn.push('red');
+                        for (let i = 0; i < wave.purple; i++) enemiesToSpawn.push('purple');
+                        // Mezclar el array para aleatoriedad
+                        for (let i = enemiesToSpawn.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [enemiesToSpawn[i], enemiesToSpawn[j]] = [enemiesToSpawn[j], enemiesToSpawn[i]];
+                        }
+                    }
+
+                    function spawnEnemy() {
+                        if (gameOver) return;
+                        if (enemiesToSpawn.length === 0) return;
+                        const type = enemiesToSpawn.shift();
+                        const baseSize = 30;
+                        const size = Math.round(baseSize * 2);
+                        const positions = [
+                            { x: 0, y: 0 },
+                            { x: canvas.width - size, y: 0 },
+                            { x: 0, y: canvas.height - size },
+                            { x: canvas.width - size, y: canvas.height - size }
+                        ];
+                        const idx = Math.floor(Math.random() * 4);
+                        const pos = positions[idx];
+                        const cx = centerX();
+                        const cy = centerY();
+                        const angle = Math.atan2(cy - (pos.y + size/2), cx - (pos.x + size/2));
+                        let speed = 1.5;
+                        let color = "yellow";
+                        if (type === 'red') {
+                            speed *= 1.35;
+                            color = "red";
+                        } else if (type === 'purple') {
+                            speed *= 1.6;
+                            color = "purple";
+                        }
+                        enemies.push({
+                            x: pos.x,
+                            y: pos.y,
+                            size,
+                            speed,
+                            dx: Math.cos(angle),
+                            dy: Math.sin(angle),
+                            hit: false,
+                            color,
+                            baseSpeed: 1.5
+                        });
+                    }
+
+                    function nextWave() {
+                        currentWave++;
+                        if (currentWave < waves.length) {
+                            prepareWave(currentWave);
+                            const interval = waves[currentWave].interval;
+                            spawnWaveInterval = setInterval(() => {
+                                if (enemiesToSpawn.length > 0) {
+                                    spawnEnemy();
+                                } else {
+                                    clearInterval(spawnWaveInterval);
+                                }
+                            }, interval);
+                        } else {
+                            // Todas las oleadas completadas, el jugador gana
+                            setTimeout(() => showEndScreen(true), 600);
+                        }
+                    }
+                    let spawnWaveInterval;
+
                     function drawPlayer() {
                         // Dibuja la imagen del mango en el centro
                         const mangoImg = new Image();
@@ -490,8 +573,11 @@
                         return 'yellow';
                     }
                     function spawnEnemy() {
+                        if (gameOver) return;
+                        if (enemiesToSpawn.length === 0) return;
+                        const type = enemiesToSpawn.shift();
                         const baseSize = 30;
-                        const size = Math.round(baseSize * 2); // 100% más grande (el doble)
+                        const size = Math.round(baseSize * 2);
                         // Esquinas del canvas
                         const positions = [
                             { x: 0, y: 0 },
@@ -504,7 +590,6 @@
                         const cx = centerX();
                         const cy = centerY();
                         const angle = Math.atan2(cy - (pos.y + size/2), cx - (pos.x + size/2));
-                        const type = getEnemyType();
                         let speed = 1.5;
                         let color = "yellow";
                         if (type === 'red') {
@@ -526,6 +611,7 @@
                             baseSpeed: 1.5 // velocidad base del amarillo
                         });
                     }
+
                     function showEndScreen(playerWon) {
                         const pongContainer = document.getElementById('pong-container');
                         // Detener la música al finalizar el juego
@@ -603,8 +689,16 @@
                         } else {
                             setTimeout(() => {
                                 gameStarted = true;
+                                prepareWave(0);
+                                const interval = waves[0].interval;
+                                spawnWaveInterval = setInterval(() => {
+                                    if (enemiesToSpawn.length > 0) {
+                                        spawnEnemy();
+                                    } else {
+                                        clearInterval(spawnWaveInterval);
+                                    }
+                                }, interval);
                                 updateGame();
-                                setInterval(spawnEnemy, 1000);
                             }, 1000);
                         }
                     }
@@ -686,8 +780,12 @@
                                 enemies.splice(i, 1);
                                 score++;
                                 updateProgressBar();
-                                // Eliminado: score++;
-                                // Eliminado: if (score >= winScore) { ... }
+                                totalEnemies++;
+                                if (totalEnemies >= winScore) {
+                                    gameOver = true;
+                                    setTimeout(() => showEndScreen(true), 600);
+                                    return;
+                                }
                             }
                             for (let j = bullets.length - 1; j >= 0; j--) {
                                 const b = bullets[j];
@@ -700,6 +798,10 @@
                                     break;
                                 }
                             }
+                        }
+                        // Si no quedan enemigos activos ni por salir, pasa a la siguiente oleada
+                        if (enemies.length === 0 && enemiesToSpawn.length === 0 && !gameOver && currentWave < waves.length - 1) {
+                            nextWave();
                         }
                         requestAnimationFrame(updateGame);
                     }

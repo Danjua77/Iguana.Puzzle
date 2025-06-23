@@ -451,10 +451,10 @@
                     let winScore = 0;
                     // --- Oleadas de enemigos ---
                     const waves = [
-                        { yellow: 14, red: 6, purple: 0, interval: 1000 }, // Oleada 1 (igual)
-                        { yellow: 10, red: 20, purple: 0, interval: 870 }, // Oleada 2 (15% más rápido)
-                        { yellow: 10, red: 20, purple: 10, interval: 800 }, // Oleada 3 (20% más rápido)
-                        { yellow: 0, red: 20, purple: 20, interval: 800 } // Oleada 4 (20% más rápido)
+                        { yellow: 18, red: 10, purple: 2, interval: 800 }, // Oleada 1 (más enemigos y más rápido)
+                        { yellow: 12, red: 24, purple: 6, interval: 650 }, // Oleada 2 (más rojos y morados, más rápido)
+                        { yellow: 8, red: 28, purple: 18, interval: 550 }, // Oleada 3 (más rojos y morados, aún más rápido)
+                        { yellow: 0, red: 30, purple: 30, interval: 450 } // Oleada 4 (solo rojos y morados, muy rápido)
                     ];
                     let currentWave = 0;
                     let enemiesToSpawn = [];

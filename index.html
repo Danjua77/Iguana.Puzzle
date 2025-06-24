@@ -399,7 +399,7 @@
                     // Ajuste: 40% más fáciles (reducción adicional para que el jugador pueda ganar más fácil)
                     const waves = [
                         { yellow: Math.round(36 * 0.8 * 0.8 * 0.7), red: Math.round(24 * 0.8 * 0.8 * 0.7), purple: Math.round(12 * 0.8 * 0.8 * 0.7), interval: 400 }, // Oleada 1
-                        { yellow: Math.round(24 * 0.8 * 0.8 * 0.7), red: Math.round(48 * 0.8 * 0.8 * 0.7), purple: Math.round(24 * 0.8 * 0.8 * 0.7), interval: 300 }, // Oleada 2
+                        { yellow: Math.round(24 * 0.8 * 0.8 * 0.7), red: Math.round(48 * 0.8 * 0.7), purple: Math.round(24 * 0.8 * 0.8 * 0.7), interval: 300 }, // Oleada 2
                         { yellow: Math.round(12 * 0.8 * 0.8 * 0.7), red: Math.round(60 * 0.8 * 0.8 * 0.7), purple: Math.round(36 * 0.8 * 0.8 * 0.7), interval: 200 }, // Oleada 3
                         { yellow: 0, red: Math.round(80 * 0.8 * 0.8 * 0.7), purple: Math.round(60 * 0.8 * 0.8 * 0.7), interval: 120 } // Oleada 4
                     ];
@@ -609,7 +609,7 @@
                                 document.getElementById('pong-end').innerHTML = `
                                     <h2 style=\"margin-top:0;\">Siguiente pista</h2>
                                     <div id=\"pong-next-img\" style=\"margin:0; padding:0;\">
-                                        <img src=\"silla2\" alt=\"Pista\" style=\"width:100%;height:100%;object-fit:cover;display:block;border-radius:12px 12px 12px 12px;\">
+                                        <img src=\"silla2.jpeg\" alt=\"Pista\" style=\"width:100%;height:100%;object-fit:cover;display:block;border-radius:12px 12px 12px 12px;\">
                                     </div>
                                     <button id=\"pong-continue\" style=\"font-size:1.3rem;background:#178a2c;color:#fff;border:2px solid #fff;border-radius:8px;padding:0.7rem 2.5rem;font-weight:bold;font-family:'Montserrat',Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.12);cursor:pointer;margin-top:1.5rem;margin-bottom:2rem;\">Continuar</button>
                                 `;
@@ -710,9 +710,15 @@
                                 marker.innerHTML = '<img src="iganaf.png" style="width:100%;height:100%;display:block;">';
                             } else if (i === waveStartPoints.length - 1) {
                                 marker.style.right = '0px';
+                                marker.innerHTML = '';
+                            } else if (i === 2) {
+                                // Oleada 3 usa iga.png
+                                let leftPercent = percent;
+                                if (leftPercent < 6) leftPercent = 6;
+                                if (leftPercent > 94) leftPercent = 94;
+                                marker.style.left = `calc(${leftPercent}% - 9px)`;
                                 marker.innerHTML = '<img src="iga.png" style="width:100%;height:100%;display:block;">';
                             } else {
-                                // Limitar el rango para que no se salgan ni se superpongan
                                 let leftPercent = percent;
                                 if (leftPercent < 6) leftPercent = 6;
                                 if (leftPercent > 94) leftPercent = 94;

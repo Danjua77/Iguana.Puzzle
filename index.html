@@ -398,10 +398,10 @@
                     // --- Oleadas de enemigos ---
                     // Ajuste: 20% más fáciles (reducción adicional del 20%)
                     const waves = [
-                        { yellow: Math.round(36 * 0.8 * 0.8), red: Math.round(24 * 0.8 * 0.8), purple: Math.round(12 * 0.8 * 0.8), interval: 400 }, // Oleada 1
-                        { yellow: Math.round(24 * 0.8 * 0.8), red: Math.round(48 * 0.8 * 0.8), purple: Math.round(24 * 0.8 * 0.8), interval: 300 }, // Oleada 2
-                        { yellow: Math.round(12 * 0.8 * 0.8), red: Math.round(60 * 0.8 * 0.8), purple: Math.round(36 * 0.8 * 0.8), interval: 200 }, // Oleada 3
-                        { yellow: 0, red: Math.round(80 * 0.8 * 0.8), purple: Math.round(60 * 0.8 * 0.8), interval: 120 } // Oleada 4
+                        { yellow: Math.round(36 * 0.8 * 0.8 * 0.8), red: Math.round(24 * 0.8 * 0.8 * 0.8), purple: Math.round(12 * 0.8 * 0.8 * 0.8), interval: 400 }, // Oleada 1
+                        { yellow: Math.round(24 * 0.8 * 0.8 * 0.8), red: Math.round(48 * 0.8 * 0.8 * 0.8), purple: Math.round(24 * 0.8 * 0.8 * 0.8), interval: 300 }, // Oleada 2
+                        { yellow: Math.round(12 * 0.8 * 0.8 * 0.8), red: Math.round(60 * 0.8 * 0.8 * 0.8), purple: Math.round(36 * 0.8 * 0.8 * 0.8), interval: 200 }, // Oleada 3
+                        { yellow: 0, red: Math.round(80 * 0.8 * 0.8 * 0.8), purple: Math.round(60 * 0.8 * 0.8 * 0.8), interval: 120 } // Oleada 4
                     ];
                     let currentWave = 0;
                     let enemiesToSpawn = [];
@@ -693,20 +693,29 @@
                             fill.parentElement.appendChild(markers);
                         }
                         markers.innerHTML = '';
-                        for (let i = 1; i < waveStartPoints.length; i++) { // No marcar el 0%
+                        for (let i = 0; i < waveStartPoints.length; i++) {
                             const percent = (waveStartPoints[i] / winScore) * 100;
                             const marker = document.createElement('div');
                             marker.style.position = 'absolute';
-                            marker.style.left = `calc(${percent}% - 6px)`;
                             marker.style.top = '50%';
                             marker.style.transform = 'translateY(-50%)';
-                            marker.style.width = '12px';
-                            marker.style.height = '12px';
-                            marker.style.background = '#ffe44d';
-                            marker.style.border = '2px solid #fff176';
-                            marker.style.borderRadius = '50%';
-                            marker.style.boxShadow = '0 0 8px #ffe44d99';
                             marker.style.zIndex = '3';
+                            marker.style.background = 'none';
+                            marker.style.border = 'none';
+                            marker.style.boxShadow = 'none';
+                            if (i === 0 || i === 1 || i === 2) {
+                                // Oleadas 1, 2, 3: iganaf.png
+                                marker.style.width = '18px';
+                                marker.style.height = '18px';
+                                marker.style.left = `calc(${percent}% - 9px)`;
+                                marker.innerHTML = '<img src="iganaf.png" style="width:100%;height:100%;display:block;">';
+                            } else if (i === 3) {
+                                // Oleada 4: iga.png
+                                marker.style.width = '18px';
+                                marker.style.height = '18px';
+                                marker.style.left = `calc(${percent}% - 9px)`;
+                                marker.innerHTML = '<img src="iga.png" style="width:100%;height:100%;display:block;">';
+                            }
                             markers.appendChild(marker);
                         }
                     }

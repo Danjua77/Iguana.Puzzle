@@ -396,12 +396,12 @@
                     let score = 0;
                     let winScore = 0;
                     // --- Oleadas de enemigos ---
-                    // Ajuste: 20% más fáciles (reducción adicional del 20% para que el jugador pueda ganar)
+                    // Ajuste: 40% más fáciles (reducción adicional para que el jugador pueda ganar más fácil)
                     const waves = [
-                        { yellow: Math.round(36 * 0.8 * 0.8 * 0.8 * 0.8 * 0.8), red: Math.round(24 * 0.8 * 0.8 * 0.8 * 0.8 * 0.8), purple: Math.round(12 * 0.8 * 0.8 * 0.8 * 0.8 * 0.8), interval: 400 }, // Oleada 1
-                        { yellow: Math.round(24 * 0.8 * 0.8 * 0.8 * 0.8 * 0.8), red: Math.round(48 * 0.8 * 0.8 * 0.8 * 0.8 * 0.8), purple: Math.round(24 * 0.8 * 0.8 * 0.8 * 0.8 * 0.8), interval: 300 }, // Oleada 2
-                        { yellow: Math.round(12 * 0.8 * 0.8 * 0.8 * 0.8 * 0.8), red: Math.round(60 * 0.8 * 0.8 * 0.8 * 0.8 * 0.8), purple: Math.round(36 * 0.8 * 0.8 * 0.8 * 0.8 * 0.8), interval: 200 }, // Oleada 3
-                        { yellow: 0, red: Math.round(80 * 0.8 * 0.8 * 0.8 * 0.8 * 0.8), purple: Math.round(60 * 0.8 * 0.8 * 0.8 * 0.8 * 0.8), interval: 120 } // Oleada 4
+                        { yellow: Math.round(36 * 0.8 * 0.8 * 0.7), red: Math.round(24 * 0.8 * 0.8 * 0.7), purple: Math.round(12 * 0.8 * 0.8 * 0.7), interval: 400 }, // Oleada 1
+                        { yellow: Math.round(24 * 0.8 * 0.8 * 0.7), red: Math.round(48 * 0.8 * 0.8 * 0.7), purple: Math.round(24 * 0.8 * 0.8 * 0.7), interval: 300 }, // Oleada 2
+                        { yellow: Math.round(12 * 0.8 * 0.8 * 0.7), red: Math.round(60 * 0.8 * 0.8 * 0.7), purple: Math.round(36 * 0.8 * 0.8 * 0.7), interval: 200 }, // Oleada 3
+                        { yellow: 0, red: Math.round(80 * 0.8 * 0.8 * 0.7), purple: Math.round(60 * 0.8 * 0.8 * 0.7), interval: 120 } // Oleada 4
                     ];
                     let currentWave = 0;
                     let enemiesToSpawn = [];

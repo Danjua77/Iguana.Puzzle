@@ -592,6 +592,9 @@
                         }
                         let html = '';
                         if (playerWon) {
+                            // Reproducir sonido de victoria
+                            const winAudio = new Audio('ok.mp3');
+                            winAudio.play().catch(()=>{});
                             html = `
                                 <div class=\"arbol-chan-container\" id=\"pong-end\" style=\"position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10;background:url('Fondo texto.jpg') no-repeat center center;background-size:cover;display:flex;flex-direction:column;justify-content:center;align-items:center;\">
                                     <div class=\"arbol-chan-content\" style=\"background:none;box-shadow:none;\">

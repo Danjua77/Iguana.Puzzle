@@ -454,7 +454,7 @@
                         const cx = centerX();
                         const cy = centerY();
                         const angle = Math.atan2(cy - (y + size/2), cx - (x + size/2));
-                        let speed = 1.5;
+                        let speed = 1.5 * 0.85;
                         let color = "yellow";
                         if (type === 'red') {
                             speed *= 1.35;
@@ -472,7 +472,7 @@
                             dy: Math.sin(angle),
                             hit: false,
                             color,
-                            baseSpeed: 1.5
+                            baseSpeed: 1.5 * 0.85
                         });
                     }
 
@@ -560,7 +560,7 @@
                         const cx = centerX();
                         const cy = centerY();
                         const angle = Math.atan2(cy - (y + size/2), cx - (x + size/2));
-                        let speed = 1.5;
+                        let speed = 1.5 * 0.85;
                         let color = "yellow";
                         if (type === 'red') {
                             speed *= 1.35;
@@ -578,7 +578,7 @@
                             dy: Math.sin(angle),
                             hit: false,
                             color,
-                            baseSpeed: 1.5 // velocidad base del amarillo
+                            baseSpeed: 1.5 * 0.85 // velocidad base del amarillo
                         });
                     }
 
